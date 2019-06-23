@@ -16,11 +16,11 @@ import java.util.List;
 @Component
 public class UserDaoService {
 
-    private static List<User> userRepository;
+    private static List<User> userRepository = new ArrayList<>();;
     private static int userCount = 3;
 
     public UserDaoService() {
-        userRepository = new ArrayList<>();
+
     }
 
     static {
