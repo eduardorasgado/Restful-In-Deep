@@ -21,8 +21,12 @@ public class HelloWorldController {
         return "Hello world";
     }
 
-    @GetMapping("/hello-world-2")
-    public String helloworld2() {
-        return "Again hello world";
+    /**
+     * Returning a bean which is automatically converted into a json
+     * @return
+     */
+    @GetMapping("/hello-world-bean")
+    public HelloWorldBean helloworldBean() {
+        return new HelloWorldBean("Hello world bean");
     }
 }
