@@ -19,5 +19,5 @@ public class User {
     private Integer id;
     private String name;
     private String lastName;
-    private Date dateBirth;
+    private Date birthDate;
 }

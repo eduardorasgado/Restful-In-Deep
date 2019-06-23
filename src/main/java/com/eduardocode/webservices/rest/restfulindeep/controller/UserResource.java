@@ -2,11 +2,11 @@ package com.eduardocode.webservices.rest.restfulindeep.controller;
 
 import com.eduardocode.webservices.rest.restfulindeep.model.User;
 import com.eduardocode.webservices.rest.restfulindeep.service.UserDaoService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -39,5 +39,19 @@ public class UserResource {
     @GetMapping("/{user_id}")
     public User getUserById(@PathVariable("user_id") Integer userId){
         return this.userService.findById(userId);
+    }
+
+    @PostMapping
+    public ResponseEntity<?> createUser(@RequestBody User user) {
+        User userCreated = this.userService.save(user);
+
+        // /users/{id}
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(userCreated.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).build();
     }
 }
