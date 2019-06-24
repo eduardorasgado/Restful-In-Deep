@@ -2,7 +2,9 @@ package com.eduardocode.webservices.rest.restfulindeep.controller;
 
 import com.eduardocode.webservices.rest.restfulindeep.exception.UserNotFoundException;
 import com.eduardocode.webservices.rest.restfulindeep.model.User;
+import com.eduardocode.webservices.rest.restfulindeep.payload.ApiResponse;
 import com.eduardocode.webservices.rest.restfulindeep.service.UserDaoService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -30,8 +32,12 @@ public class UserResource {
      * Method to retreive all users
      */
     @GetMapping
-    public List<User> getAll() {
-        return userService.findAll();
+    public ResponseEntity<List<User>> getAll() {
+        List<User> users = this.userService.findAll();
+        if(users != null) {
+            return ResponseEntity.ok(users);
+        }
+        throw new RuntimeException("No se recuperó una lista con usuarios, esta es nula");
     }
 
     /**
@@ -48,7 +54,6 @@ public class UserResource {
         if(user != null) {
             return user;
         }
-
         throw new UserNotFoundException("id: "+userId);
     }
 
@@ -56,13 +61,24 @@ public class UserResource {
     public ResponseEntity<?> createUser(@RequestBody User user) {
         User userCreated = this.userService.save(user);
 
-        // /users/{id}
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(userCreated.getId())
-                .toUri();
+        if(userCreated != null) {
+            // api/users/{id}
+            URI location = ServletUriComponentsBuilder
+                    .fromCurrentRequest()
+                    .path("/{id}")
+                    .buildAndExpand(userCreated.getId())
+                    .toUri();
 
-        return ResponseEntity.created(location).build();
+            return ResponseEntity.created(location)
+                    .body(new ApiResponse(
+                            "success",
+                            "Se ha creado el usuario exitosamente"
+                    ));
+        }
+        return new ResponseEntity<>(new ApiResponse(
+                "error",
+                "No pudo ser creado el usuario, un error de servidor se presentó," +
+                        "intentelo más tarde"
+        ), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
