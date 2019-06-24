@@ -1,6 +1,7 @@
 package com.eduardocode.webservices.rest.restfulindeep.controller;
 
 import com.eduardocode.webservices.rest.restfulindeep.exception.UserNotFoundException;
+import com.eduardocode.webservices.rest.restfulindeep.model.Post;
 import com.eduardocode.webservices.rest.restfulindeep.model.User;
 import com.eduardocode.webservices.rest.restfulindeep.payload.ApiResponse;
 import com.eduardocode.webservices.rest.restfulindeep.service.UserDaoService;
@@ -57,6 +58,11 @@ public class UserResource {
         throw new UserNotFoundException("id: "+userId);
     }
 
+    /**
+     * Method to request the creation of a new user in db
+     * @param user
+     * @return
+     */
     @PostMapping
     public ResponseEntity<?> createUser(@RequestBody User user) {
         User userCreated = this.userService.save(user);
@@ -80,5 +86,44 @@ public class UserResource {
                 "No pudo ser creado el usuario, un error de servidor se presentó," +
                         "intentelo más tarde"
         ), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    /**
+     * Method to create a post given a owner user
+     * @param userId
+     * @param postRequest
+     * @return
+     */
+    @PostMapping("/{user_id}/posts")
+    public ResponseEntity<?> createPostByUser(
+            @PathVariable("user_id") Integer userId,
+            @RequestBody Post postRequest
+    ) {
+        if(postRequest != null) {
+            Post post = this.userService.createPost(userId, postRequest);
+            if(post != null) {
+                return ResponseEntity.ok(new ApiResponse(
+                        "success",
+                        "Se ha creado un nuevo post con exito"
+                ));
+            }
+            // en caso de que no exista el usuario
+            throw new UserNotFoundException("id: "+userId);
+        }
+        // en caso de que postrequest venga vacio
+        return new ResponseEntity<>(new ApiResponse(
+                "error",
+                "No existe el postRequest o está vacío"
+        ), HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Method to retreive all the posts given a user
+     * @param userId
+     * @return
+     */
+    @GetMapping("/{user_id}/posts")
+    public List<Post> findAllPostByUser(@PathVariable("user_id") Integer userId) {
+        return this.userService.findAllPostsByUserId(userId);
     }
 }
