@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * <h1>User</h1>
@@ -20,4 +21,12 @@ public class User {
     private String name;
     private String lastName;
     private Date birthDate;
+    private List<Post> posts;
+
+    public User(Integer id, String name, String lastName, Date birthDate) {
+        this.id = id;
+        this.name = name;
+        this.lastName = lastName;
+        this.birthDate = birthDate;
+    }
 }
