@@ -1,5 +1,6 @@
 package com.eduardocode.webservices.rest.restfulindeep.controller;
 
+import com.eduardocode.webservices.rest.restfulindeep.error.UserNotFoundException;
 import com.eduardocode.webservices.rest.restfulindeep.model.User;
 import com.eduardocode.webservices.rest.restfulindeep.service.UserDaoService;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +39,11 @@ public class UserResource {
      */
     @GetMapping("/{user_id}")
     public User getUserById(@PathVariable("user_id") Integer userId){
-        return this.userService.findById(userId);
+        User user = this.userService.findById(userId);
+        if(user != null) {
+            return user;
+        }
+        throw new UserNotFoundException("id: "+userId);
     }
 
     @PostMapping
