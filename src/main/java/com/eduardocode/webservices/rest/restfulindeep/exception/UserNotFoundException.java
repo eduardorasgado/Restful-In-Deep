@@ -1,4 +1,4 @@
-package com.eduardocode.webservices.rest.restfulindeep.error;
+package com.eduardocode.webservices.rest.restfulindeep.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
