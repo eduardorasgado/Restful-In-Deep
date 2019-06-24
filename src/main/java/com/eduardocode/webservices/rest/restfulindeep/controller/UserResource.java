@@ -1,6 +1,6 @@
 package com.eduardocode.webservices.rest.restfulindeep.controller;
 
-import com.eduardocode.webservices.rest.restfulindeep.error.UserNotFoundException;
+import com.eduardocode.webservices.rest.restfulindeep.exception.UserNotFoundException;
 import com.eduardocode.webservices.rest.restfulindeep.model.User;
 import com.eduardocode.webservices.rest.restfulindeep.service.UserDaoService;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +35,12 @@ public class UserResource {
     }
 
     /**
-     * Method to retreive a user given an id
+     * Method to retreive a user given an id.
+     * It throws a user not found exception if user does not exists, then it
+     * returns a {@link com.eduardocode.webservices.rest.restfulindeep.exception.ResponseGeneralException}
+     * class based json error details, using
+     * {@link com.eduardocode.webservices.rest.restfulindeep.exception.CustomizedResponseEntityExceptionHandler}
+     * rest controller and rest advice
      */
     @GetMapping("/{user_id}")
     public User getUserById(@PathVariable("user_id") Integer userId){
@@ -43,6 +48,7 @@ public class UserResource {
         if(user != null) {
             return user;
         }
+
         throw new UserNotFoundException("id: "+userId);
     }
 
