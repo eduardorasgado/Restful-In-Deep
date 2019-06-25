@@ -4,13 +4,16 @@ import com.eduardocode.webservices.rest.restfulindeep.exception.UserNotFoundExce
 import com.eduardocode.webservices.rest.restfulindeep.model.Post;
 import com.eduardocode.webservices.rest.restfulindeep.model.User;
 import com.eduardocode.webservices.rest.restfulindeep.payload.ApiResponse;
+import com.eduardocode.webservices.rest.restfulindeep.payload.PostRequest;
 import com.eduardocode.webservices.rest.restfulindeep.service.UserDaoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.net.URI;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -97,10 +100,12 @@ public class UserResource {
     @PostMapping("/{user_id}/posts")
     public ResponseEntity<?> createPostByUser(
             @PathVariable("user_id") Integer userId,
-            @RequestBody Post postRequest
+            @Valid @RequestBody PostRequest postRequest
     ) {
         if(postRequest != null) {
-            Post post = this.userService.createPost(userId, postRequest);
+            Post post = this.mappingPostPayload(postRequest);
+            post.setTimestamp(new Date());
+            post = this.userService.createPost(userId, post);
             if(post != null) {
                 return ResponseEntity.ok(new ApiResponse(
                         "success",
@@ -123,7 +128,17 @@ public class UserResource {
      * @return
      */
     @GetMapping("/{user_id}/posts")
-    public List<Post> findAllPostByUser(@PathVariable("user_id") Integer userId) {
-        return this.userService.findAllPostsByUserId(userId);
+    public ResponseEntity<List<Post>> findAllPostByUser(@PathVariable("user_id") Integer userId) {
+        return new ResponseEntity<>(this.userService.findAllPostsByUserId(userId), HttpStatus.OK);
     }
+
+    private Post mappingPostPayload(PostRequest postRequest) {
+        Post post = new Post();
+        post.setTitle(postRequest.getTitle());
+        post.setContent(postRequest.getContent());
+        post.setTags(postRequest.getTags());
+
+        return post;
+    }
+
 }
