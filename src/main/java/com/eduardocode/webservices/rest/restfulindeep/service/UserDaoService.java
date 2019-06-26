@@ -65,6 +65,15 @@ public class UserDaoService {
         return null;
     }
 
+    public boolean userExists(Integer id) {
+        for(User user : userRepository) {
+            if(user.getId().equals(id)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      *
      * Method to create a post for certain user
