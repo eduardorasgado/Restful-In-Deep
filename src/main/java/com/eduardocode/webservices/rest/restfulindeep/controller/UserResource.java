@@ -5,7 +5,9 @@ import com.eduardocode.webservices.rest.restfulindeep.model.Post;
 import com.eduardocode.webservices.rest.restfulindeep.model.User;
 import com.eduardocode.webservices.rest.restfulindeep.payload.ApiResponse;
 import com.eduardocode.webservices.rest.restfulindeep.payload.PostRequest;
+import com.eduardocode.webservices.rest.restfulindeep.payload.UserSignUpRequest;
 import com.eduardocode.webservices.rest.restfulindeep.service.UserDaoService;
+import com.eduardocode.webservices.rest.restfulindeep.util.BasicUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -58,32 +60,36 @@ public class UserResource {
         if(user != null) {
             return user;
         }
-        throw new UserNotFoundException("id: "+userId);
+        throw new UserNotFoundException("Usuario no existente, id: "+userId);
     }
 
     /**
      * Method to request the creation of a new user in db
-     * @param user
+     * @param userReq
      * @return
      */
     @PostMapping
-    public ResponseEntity<?> createUser(@RequestBody User user) {
-        User userCreated = this.userService.save(user);
+    public ResponseEntity<?> createUser(@Valid @RequestBody UserSignUpRequest userReq) {
 
-        if(userCreated != null) {
-            // api/users/{id}
-            URI location = ServletUriComponentsBuilder
-                    .fromCurrentRequest()
-                    .path("/{id}")
-                    .buildAndExpand(userCreated.getId())
-                    .toUri();
+        if(userReq != null) {
+            User user = this.mappingUserReq(userReq);
+            User userCreated = this.userService.save(user);
+            if(userCreated != null) {
+                // api/users/{id}
+                URI location = ServletUriComponentsBuilder
+                        .fromCurrentRequest()
+                        .path("/{id}")
+                        .buildAndExpand(userCreated.getId())
+                        .toUri();
 
-            return ResponseEntity.created(location)
-                    .body(new ApiResponse(
-                            "success",
-                            "Se ha creado el usuario exitosamente"
-                    ));
+                return ResponseEntity.created(location)
+                        .body(new ApiResponse(
+                                "success",
+                                "Se ha creado el usuario exitosamente"
+                        ));
+            }
         }
+
         return new ResponseEntity<>(new ApiResponse(
                 "error",
                 "No pudo ser creado el usuario, un error de servidor se presentó," +
@@ -113,7 +119,7 @@ public class UserResource {
                 ));
             }
             // en caso de que no exista el usuario
-            throw new UserNotFoundException("id: "+userId);
+            throw new UserNotFoundException("usuario no existente, id: "+userId);
         }
         // en caso de que postrequest venga vacio
         return new ResponseEntity<>(new ApiResponse(
@@ -130,6 +136,21 @@ public class UserResource {
     @GetMapping("/{user_id}/posts")
     public ResponseEntity<List<Post>> findAllPostByUser(@PathVariable("user_id") Integer userId) {
         return new ResponseEntity<>(this.userService.findAllPostsByUserId(userId), HttpStatus.OK);
+    }
+
+    // UTILITIES =========
+
+    private User mappingUserReq(UserSignUpRequest userReq) {
+        User user = new User();
+        user.setName(userReq.getName());
+        user.setLastName(userReq.getLastName());
+        Date date = BasicUtils.transformToDate(userReq.getBirthDate());
+        if(date != null) {
+            user.setBirthDate(date);
+        } else {
+            user.setBirthDate(new Date());
+        }
+        return user;
     }
 
     private Post mappingPostPayload(PostRequest postRequest) {
