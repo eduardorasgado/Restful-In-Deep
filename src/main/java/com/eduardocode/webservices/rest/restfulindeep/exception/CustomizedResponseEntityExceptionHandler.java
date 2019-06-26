@@ -58,4 +58,23 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
 
         return new ResponseEntity<>(rge, HttpStatus.NOT_FOUND);
     }
+
+    /**
+     * Method to send error details to client when a post does not exists in db
+     * @param ex
+     * @param request
+     * @return
+     * @throws Exception
+     */
+    @ExceptionHandler(PostNotFoundException.class)
+    public final ResponseEntity<Object> handlePostNotFoundException(
+            Exception ex, WebRequest request
+    ) throws Exception {
+        ResponseGeneralException  rge = new ResponseGeneralException(
+                new Date(),
+                ex.getMessage(),
+                request.getDescription(false)
+                );
+        return new ResponseEntity<>(rge, HttpStatus.NOT_FOUND);
+    }
 }
