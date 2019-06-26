@@ -1,5 +1,6 @@
 package com.eduardocode.webservices.rest.restfulindeep.controller;
 
+import com.eduardocode.webservices.rest.restfulindeep.exception.PostNotFoundException;
 import com.eduardocode.webservices.rest.restfulindeep.exception.UserNotFoundException;
 import com.eduardocode.webservices.rest.restfulindeep.model.Post;
 import com.eduardocode.webservices.rest.restfulindeep.model.User;
@@ -136,6 +137,24 @@ public class UserResource {
     @GetMapping("/{user_id}/posts")
     public ResponseEntity<List<Post>> findAllPostByUser(@PathVariable("user_id") Integer userId) {
         return new ResponseEntity<>(this.userService.findAllPostsByUserId(userId), HttpStatus.OK);
+    }
+
+    @GetMapping("/{user_id}/posts/{post_id}")
+    public ResponseEntity<Post> getUserPost(
+            @PathVariable("user_id") Integer userId,
+            @PathVariable("post_id") Integer postId
+    ){
+        if(this.userService.userExists(userId)) {
+            Post post = this.userService.findPostByUserIdAndByPostId(userId, postId);
+            if(post != null) {
+                return ResponseEntity.ok(post);
+            }
+            else {
+                throw new PostNotFoundException("Post de usuario con id:"+userId
+                        +" inexistente, post id: "+postId);
+            }
+        }
+        throw new UserNotFoundException("Usuario inexistente, id: "+ userId);
     }
 
     // UTILITIES =========
