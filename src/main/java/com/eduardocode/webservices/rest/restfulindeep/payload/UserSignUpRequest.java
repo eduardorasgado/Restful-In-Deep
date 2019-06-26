@@ -1,26 +1,26 @@
 package com.eduardocode.webservices.rest.restfulindeep.payload;
 
+import com.eduardocode.webservices.rest.restfulindeep.model.Post;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 /**
- * <h1>PostRequest</h1>
- * Class to be able to map a request body in case user wants to create a new post
- *
- * @author Eduardo Rasgado Ruiz
+ * Class to be able to map user data from signup request in user resource
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostRequest {
+public class UserSignUpRequest {
     @NotBlank
-    private String title;
+    private String name;
     @NotBlank
-    private String content;
-    private Set<String> tags;
+    private String lastName;
+    @NotBlank
+    private String birthDate;
 }
+
