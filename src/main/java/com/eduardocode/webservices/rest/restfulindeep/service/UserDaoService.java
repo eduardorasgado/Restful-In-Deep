@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -65,6 +66,28 @@ public class UserDaoService {
         return null;
     }
 
+    /**
+     * Method to delete a user if it exists
+     * @param id
+     * @return
+     */
+    public User deleteById(Integer id) {
+        Iterator<User> i = userRepository.iterator();
+        while (i.hasNext()) {
+            User user = i.next();
+            if(user.getId().equals(id)) {
+                i.remove();
+                return user;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Method to return if a user exists in database or not
+     * @param id
+     * @return
+     */
     public boolean userExists(Integer id) {
         for(User user : userRepository) {
             if(user.getId().equals(id)) {
