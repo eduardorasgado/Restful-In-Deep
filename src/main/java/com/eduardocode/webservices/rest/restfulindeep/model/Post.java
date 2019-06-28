@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Past;
 import java.util.Date;
 import java.util.Set;
 
@@ -18,7 +20,9 @@ import java.util.Set;
 @NoArgsConstructor
 public class Post {
     private Integer id;
+    @NotBlank
     private String title;
+    @NotBlank
     private String content;
     private Set<String> tags;
     private Date timestamp;

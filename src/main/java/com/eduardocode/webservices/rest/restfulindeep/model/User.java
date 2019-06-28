@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Past;
 import java.util.Date;
 import java.util.List;
 
@@ -18,8 +20,11 @@ import java.util.List;
 @NoArgsConstructor
 public class User {
     private Integer id;
+    @NotBlank
     private String name;
+    @NotBlank
     private String lastName;
+    @Past
     private Date birthDate;
     private List<Post> posts;
 
