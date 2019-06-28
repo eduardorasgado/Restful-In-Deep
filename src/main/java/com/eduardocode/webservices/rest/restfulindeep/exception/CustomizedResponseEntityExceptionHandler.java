@@ -3,6 +3,7 @@ package com.eduardocode.webservices.rest.restfulindeep.exception;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -11,6 +12,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * <h1>CustomizedResponseEntityExceptionHandler</h1>
@@ -94,10 +96,13 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
             MethodArgumentNotValidException ex, HttpHeaders headers,
             HttpStatus status, WebRequest request) {
 
+        List<ObjectError> errors = ex.getBindingResult().getAllErrors();
+
+
         ResponseGeneralException rge = new ResponseGeneralException(
                 new Date(),
-                ex.getMessage(),
-                ex.getBindingResult().toString()
+                "Data validation failure",
+                errors.toString()
         );
         return new ResponseEntity<>(rge, HttpStatus.BAD_REQUEST);
     }
