@@ -99,6 +99,30 @@ public class UserResource {
     }
 
     /**
+     * Method to delete an user from
+     * @param userId
+     * @return
+     */
+    @DeleteMapping("/{user_id}")
+    public ResponseEntity<?> deleteUserById(
+            @PathVariable("user_id") Integer userId
+    ) {
+        if(this.userService.userExists(userId)) {
+            User user = this.userService.deleteById(userId);
+
+            StringBuilder message = new StringBuilder("El usuario: ");
+            message.append(user.getName());
+            message.append(" ha sido eliminado con éxito");
+
+            return new ResponseEntity<>(new ApiResponse(
+                    "success",
+                            message.toString()
+            ), HttpStatus.OK);
+        }
+        throw new UserNotFoundException("El usuario que trata de eliminar no existe, id: "+userId);
+    }
+
+    /**
      * Method to create a post given a owner user
      * @param userId
      * @param postRequest
