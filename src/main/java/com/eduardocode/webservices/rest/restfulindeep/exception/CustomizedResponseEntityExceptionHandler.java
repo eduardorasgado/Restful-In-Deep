@@ -1,7 +1,9 @@
 package com.eduardocode.webservices.rest.restfulindeep.exception;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
@@ -76,5 +78,27 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
                 request.getDescription(false)
                 );
         return new ResponseEntity<>(rge, HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * Method that overrides a validation error in resources controllers, and send error details
+     * in json to client with a bad request error.
+     * @param ex
+     * @param headers
+     * @param status
+     * @param request
+     * @return
+     */
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex, HttpHeaders headers,
+            HttpStatus status, WebRequest request) {
+
+        ResponseGeneralException rge = new ResponseGeneralException(
+                new Date(),
+                ex.getMessage(),
+                ex.getBindingResult().toString()
+        );
+        return new ResponseEntity<>(rge, HttpStatus.BAD_REQUEST);
     }
 }
