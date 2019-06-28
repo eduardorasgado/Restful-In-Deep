@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -97,12 +98,15 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
             HttpStatus status, WebRequest request) {
 
         List<ObjectError> errors = ex.getBindingResult().getAllErrors();
-
+        List<String> messages = new ArrayList<>();
+        for(ObjectError e : errors) {
+            messages.add(e.getDefaultMessage());
+        }
 
         ResponseGeneralException rge = new ResponseGeneralException(
                 new Date(),
                 "Data validation failure",
-                errors.toString()
+                messages.toString()
         );
         return new ResponseEntity<>(rge, HttpStatus.BAD_REQUEST);
     }
