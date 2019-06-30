@@ -50,7 +50,7 @@ public class UserResource {
     }
 
     /**
-     * Method to retreive a user given an id.
+     * Method to retreive a user given an postId.
      * It throws a user not found exception if user does not exists, then it
      * returns a {@link com.eduardocode.webservices.rest.restfulindeep.exception.ResponseGeneralException}
      * class based json error details, using
@@ -70,17 +70,34 @@ public class UserResource {
                             this.getClass()
                     ).getAll());
 
+            // adding a link to self user
             ControllerLinkBuilder autoLink = ControllerLinkBuilder.linkTo(
                     ControllerLinkBuilder.methodOn(
                             this.getClass()
                     ).getUserById(userId)
             );
 
+            List<Post> posts = this.userService.findAllPostsByUserId(userId);
+
+            for(Post p : posts) {
+                ControllerLinkBuilder link = ControllerLinkBuilder.linkTo(
+                        ControllerLinkBuilder.methodOn(
+                                this.getClass()
+                        ).getUserPost(userId, p.getPostId())
+                );
+                // Esto porque temporalmente se está trabajando en una lista, por tanto para no
+                // modificar mas veces la lista se comprueba si es la primera vez que se agrega
+                // una url
+                if(p.getLinks().size() <= 0){
+                    p.add(link.withRel("url"));
+                }
+            }
             resource.add(linkToGetAll.withRel("all-users"));
             resource.add(autoLink.withRel("url"));
+
             return resource;
         }
-        throw new UserNotFoundException("Usuario no existente, id: "+userId);
+        throw new UserNotFoundException("Usuario no existente, postId: "+userId);
     }
 
     /**
@@ -95,10 +112,10 @@ public class UserResource {
             User user = this.mappingUserReq(userReq);
             User userCreated = this.userService.save(user);
             if(userCreated != null) {
-                // api/users/{id}
+                // api/users/{postId}
                 URI location = ServletUriComponentsBuilder
                         .fromCurrentRequest()
-                        .path("/{id}")
+                        .path("/{postId}")
                         .buildAndExpand(userCreated.getId())
                         .toUri();
 
@@ -138,7 +155,7 @@ public class UserResource {
                             message.toString()
             ), HttpStatus.OK);
         }
-        throw new UserNotFoundException("El usuario que trata de eliminar no existe, id: "+userId);
+        throw new UserNotFoundException("El usuario que trata de eliminar no existe, postId: "+userId);
     }
 
     /**
@@ -163,7 +180,7 @@ public class UserResource {
                 ));
             }
             // en caso de que no exista el usuario
-            throw new UserNotFoundException("usuario no existente, id: "+userId);
+            throw new UserNotFoundException("usuario no existente, postId: "+userId);
         }
         // en caso de que postrequest venga vacio
         return new ResponseEntity<>(new ApiResponse(
@@ -193,11 +210,11 @@ public class UserResource {
                 return ResponseEntity.ok(post);
             }
             else {
-                throw new PostNotFoundException("Post de usuario con id:"+userId
-                        +" inexistente, post id: "+postId);
+                throw new PostNotFoundException("Post de usuario con postId:"+userId
+                        +" inexistente, post postId: "+postId);
             }
         }
-        throw new UserNotFoundException("Usuario inexistente, id: "+ userId);
+        throw new UserNotFoundException("Usuario inexistente, postId: "+ userId);
     }
 
     // UTILITIES =========
