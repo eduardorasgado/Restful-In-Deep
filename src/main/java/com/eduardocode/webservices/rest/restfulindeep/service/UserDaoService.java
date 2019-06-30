@@ -18,7 +18,7 @@ import java.util.List;
 @Component
 public class UserDaoService {
 
-    private static List<User> userRepository = new ArrayList<>();;
+    private static List<User> userRepository = new ArrayList<>();
     private static int userCount = 3;
     private static int postCount = 0;
 
@@ -47,7 +47,7 @@ public class UserDaoService {
      * @return
      */
     public User save(User user) {
-        user.setId(++userCount);
+        user.setUserId(++userCount);
         userRepository.add(user);
         return this.findById(userCount);
     }
@@ -59,7 +59,7 @@ public class UserDaoService {
      */
     public User findById(Integer id) {
         for (User userRepo : userRepository) {
-            if(userRepo.getId().equals(id)) {
+            if(userRepo.getUserId().equals(id)) {
                 return userRepo;
             }
         }
@@ -75,7 +75,7 @@ public class UserDaoService {
         Iterator<User> i = userRepository.iterator();
         while (i.hasNext()) {
             User user = i.next();
-            if(user.getId().equals(id)) {
+            if(user.getUserId().equals(id)) {
                 i.remove();
                 return user;
             }
@@ -90,7 +90,7 @@ public class UserDaoService {
      */
     public boolean userExists(Integer id) {
         for(User user : userRepository) {
-            if(user.getId().equals(id)) {
+            if(user.getUserId().equals(id)) {
                 return true;
             }
         }
@@ -110,7 +110,7 @@ public class UserDaoService {
             try {
                 // obteniendo la lista de post del usuario deseado
                 for(User u : userRepository) {
-                    if(u.getId().equals(idUser)){
+                    if(u.getUserId().equals(idUser)){
                         posts = u.getPosts();
                     }
                 }
@@ -121,7 +121,7 @@ public class UserDaoService {
                 for(int i = 0; i < userRepository.size(); i++ ) {
                     User u = userRepository.get(i);
 
-                    if(u.getId().equals(idUser)) {
+                    if(u.getUserId().equals(idUser)) {
                         u.setPosts(posts);
                         userRepository.set(i, u);
                     }
@@ -143,7 +143,7 @@ public class UserDaoService {
      */
     public Post findPostByUserIdAndByPostId(Integer userId, Integer postId){
         for(User u : userRepository) {
-            if(u.getId().equals(userId)){
+            if(u.getUserId().equals(userId)){
                 for(Post p : u.getPosts()){
                     if(p.getPostId().equals(postId)){
                         return p;
@@ -161,7 +161,7 @@ public class UserDaoService {
      */
     public List<Post> findAllPostsByUserId(Integer userId) {
         for(User u : userRepository) {
-            if(u.getId().equals(userId)) {
+            if(u.getUserId().equals(userId)) {
                 return u.getPosts();
             }
         }

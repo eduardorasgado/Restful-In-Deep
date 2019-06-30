@@ -3,6 +3,7 @@ package com.eduardocode.webservices.rest.restfulindeep.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.hateoas.ResourceSupport;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Past;
@@ -18,8 +19,8 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
-    private Integer id;
+public class User extends ResourceSupport {
+    private Integer userId;
     @NotBlank
     private String name;
     @NotBlank
@@ -28,8 +29,8 @@ public class User {
     private Date birthDate;
     private List<Post> posts;
 
-    public User(Integer id, String name, String lastName, Date birthDate) {
-        this.id = id;
+    public User(Integer userId, String name, String lastName, Date birthDate) {
+        this.userId = userId;
         this.name = name;
         this.lastName = lastName;
         this.birthDate = birthDate;
