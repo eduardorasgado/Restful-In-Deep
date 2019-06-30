@@ -3,6 +3,7 @@ package com.eduardocode.webservices.rest.restfulindeep;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+
 import javax.annotation.PostConstruct;
 import java.util.TimeZone;
 
@@ -24,5 +25,4 @@ public class RestfulIndeepApplication {
     public static void main(String[] args) {
         SpringApplication.run(RestfulIndeepApplication.class, args);
     }
-
 }
