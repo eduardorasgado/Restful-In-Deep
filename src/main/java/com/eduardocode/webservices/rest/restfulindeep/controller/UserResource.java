@@ -70,7 +70,14 @@ public class UserResource {
                             this.getClass()
                     ).getAll());
 
+            ControllerLinkBuilder autoLink = ControllerLinkBuilder.linkTo(
+                    ControllerLinkBuilder.methodOn(
+                            this.getClass()
+                    ).getUserById(userId)
+            );
+
             resource.add(linkToGetAll.withRel("all-users"));
+            resource.add(autoLink.withRel("url"));
             return resource;
         }
         throw new UserNotFoundException("Usuario no existente, id: "+userId);
