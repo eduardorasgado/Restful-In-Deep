@@ -57,12 +57,6 @@ public class UserResource {
                 }
             }
 
-            ControllerLinkBuilder link = ControllerLinkBuilder.linkTo(
-                    ControllerLinkBuilder.methodOn(
-                            this.getClass()
-                    ).getAll()
-            );
-
             return ResponseEntity.ok(users);
         }
         throw new RuntimeException("No se recuperó una lista con usuarios, esta es nula");
@@ -80,21 +74,8 @@ public class UserResource {
     public Resource<User> getUserById(@PathVariable("user_id") Integer userId){
         User user = this.userService.findById(userId);
         if(user != null) {
-            List<Post> posts = this.userService.findAllPostsByUserId(userId);
 
-            for(Post p : posts) {
-                ControllerLinkBuilder link = ControllerLinkBuilder.linkTo(
-                        ControllerLinkBuilder.methodOn(
-                                this.getClass()
-                        ).getUserPost(userId, p.getPostId())
-                );
-                // Esto porque temporalmente se está trabajando en una lista, por tanto para no
-                // modificar mas veces la lista se comprueba si es la primera vez que se agrega
-                // una url
-                if(p.getLinks().size() <= 0) {
-                    p.add(link.withRel("url"));
-                }
-            }
+            List<Post> posts = this.everyMemberPostListSelfUrl(userId);
             user.setPosts(posts);
 
             // Using HATEOAS
@@ -217,9 +198,20 @@ public class UserResource {
      */
     @GetMapping("/{user_id}/posts")
     public ResponseEntity<List<Post>> findAllPostByUser(@PathVariable("user_id") Integer userId) {
-        return new ResponseEntity<>(this.userService.findAllPostsByUserId(userId), HttpStatus.OK);
+        if(this.userService.userExists(userId)) {
+            List<Post> posts = this.everyMemberPostListSelfUrl(userId);
+            return new ResponseEntity<>(posts, HttpStatus.OK);
+        }
+        throw new UserNotFoundException("El usuario de los repositorios a los que quiere tener" +
+                "acceso, no existe, id: "+userId);
     }
 
+    /**
+     * This method returns a post given a user
+     * @param userId
+     * @param postId
+     * @return
+     */
     @GetMapping("/{user_id}/posts/{post_id}")
     public ResponseEntity<Post> getUserPost(
             @PathVariable("user_id") Integer userId,
@@ -239,6 +231,30 @@ public class UserResource {
     }
 
     // UTILITIES =========
+
+    /**
+     * Method that add a self link to every post inside a user's list of posts
+     * @param userId
+     * @return
+     */
+    private List<Post> everyMemberPostListSelfUrl(Integer userId) {
+        List<Post> posts = this.userService.findAllPostsByUserId(userId);
+
+        for(Post p : posts) {
+            ControllerLinkBuilder link = ControllerLinkBuilder.linkTo(
+                    ControllerLinkBuilder.methodOn(
+                            this.getClass()
+                    ).getUserPost(userId, p.getPostId())
+            );
+            // Esto porque temporalmente se está trabajando en una lista, por tanto para no
+            // modificar mas veces la lista se comprueba si es la primera vez que se agrega
+            // una url
+            if(p.getLinks().size() <= 0) {
+                p.add(link.withRel("url"));
+            }
+        }
+        return posts;
+    }
 
     private User mappingUserReq(UserSignUpRequest userReq) {
         User user = new User();
