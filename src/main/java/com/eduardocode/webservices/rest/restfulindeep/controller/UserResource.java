@@ -87,12 +87,7 @@ public class UserResource {
                             this.getClass()
                     ).getAll());
 
-            // adding a link to self user
-            ControllerLinkBuilder autoLink = ControllerLinkBuilder.linkTo(
-                    ControllerLinkBuilder.methodOn(
-                            this.getClass()
-                    ).getUserById(userId)
-            );
+            ControllerLinkBuilder autoLink = this.getUserLink(userId);
 
             resource.add(linkToGetAll.withRel("all-users"));
             resource.add(autoLink.withRel("url"));
@@ -213,14 +208,30 @@ public class UserResource {
      * @return
      */
     @GetMapping("/{user_id}/posts/{post_id}")
-    public ResponseEntity<Post> getUserPost(
+    public ResponseEntity<Resource<Post>> getUserPost(
             @PathVariable("user_id") Integer userId,
             @PathVariable("post_id") Integer postId
     ){
         if(this.userService.userExists(userId)) {
             Post post = this.userService.findPostByUserIdAndByPostId(userId, postId);
             if(post != null) {
-                return ResponseEntity.ok(post);
+
+                Resource<Post> postResource = new Resource<>(post);
+
+                // getting the user profile link owns this post
+                ControllerLinkBuilder userLink = this.getUserLink(userId);
+
+                // adding self url
+                ControllerLinkBuilder selfLink = ControllerLinkBuilder.linkTo(
+                        ControllerLinkBuilder.methodOn(
+                                this.getClass()
+                        ).getUserPost(userId, postId)
+                );
+
+                postResource.add(userLink.withRel("user_profile"));
+                postResource.add(selfLink.withRel("url"));
+
+                return ResponseEntity.ok(postResource);
             }
             else {
                 throw new PostNotFoundException("Post de usuario con postId:"+userId
@@ -254,6 +265,21 @@ public class UserResource {
             }
         }
         return posts;
+    }
+
+    /**
+     * Method to get a link of user profile
+     * @param userId
+     * @return
+     */
+    private ControllerLinkBuilder getUserLink(Integer userId) {
+        // adding a link to self user
+        ControllerLinkBuilder autoLink = ControllerLinkBuilder.linkTo(
+                ControllerLinkBuilder.methodOn(
+                        this.getClass()
+                ).getUserById(userId)
+        );
+        return autoLink;
     }
 
     private User mappingUserReq(UserSignUpRequest userReq) {
