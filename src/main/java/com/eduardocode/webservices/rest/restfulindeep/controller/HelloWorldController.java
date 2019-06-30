@@ -1,6 +1,10 @@
 package com.eduardocode.webservices.rest.restfulindeep.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Locale;
 
 /**
  * <h1>HelloWorldController</h1>
@@ -11,6 +15,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api")
 public class HelloWorldController {
+
+    /**
+     * wiring internationalization bean
+     */
+    @Autowired
+    private MessageSource messageSource;
+
     // GET
     // URI - /hellow-world
     // method - "Hello world"s
@@ -39,5 +50,16 @@ public class HelloWorldController {
             message.append(apellidos);
         }
         return new HelloWorldBean(message.toString());
+    }
+
+    /**
+     * Method to test the internalization beans and resource bundle
+     * @param locale
+     * @return
+     */
+    @GetMapping("/hello-world-internationalized")
+    public String helloWorldInternationalized(
+            @RequestHeader(name = "Accept-Language", required=false) Locale locale) {
+        return messageSource.getMessage("good.morning.message", null, locale);
     }
 }
