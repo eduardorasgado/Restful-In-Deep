@@ -9,6 +9,8 @@ import com.eduardocode.webservices.rest.restfulindeep.payload.PostRequest;
 import com.eduardocode.webservices.rest.restfulindeep.payload.UserSignUpRequest;
 import com.eduardocode.webservices.rest.restfulindeep.service.UserDaoService;
 import com.eduardocode.webservices.rest.restfulindeep.util.BasicUtils;
+import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -56,10 +58,20 @@ public class UserResource {
      * rest controller and rest advice
      */
     @GetMapping("/{user_id}")
-    public User getUserById(@PathVariable("user_id") Integer userId){
+    public Resource<User> getUserById(@PathVariable("user_id") Integer userId){
         User user = this.userService.findById(userId);
         if(user != null) {
-            return user;
+            // Using HATEOAS
+            Resource<User> resource = new Resource<>(user);
+
+            // adding a link to resource: getAll() in this controller
+            ControllerLinkBuilder linkToGetAll = ControllerLinkBuilder.linkTo(
+                    ControllerLinkBuilder.methodOn(
+                            this.getClass()
+                    ).getAll());
+
+            resource.add(linkToGetAll.withRel("all-users"));
+            return resource;
         }
         throw new UserNotFoundException("Usuario no existente, id: "+userId);
     }
