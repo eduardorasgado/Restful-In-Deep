@@ -44,6 +44,25 @@ public class UserResource {
     public ResponseEntity<List<User>> getAll() {
         List<User> users = this.userService.findAll();
         if(users != null) {
+            // adding url to every user
+            for(User u : users) {
+                ControllerLinkBuilder link = ControllerLinkBuilder.linkTo(
+                        ControllerLinkBuilder.methodOn(
+                                this.getClass()
+                        ).getUserById(u.getUserId())
+                );
+                // avoiding reinsert another element into user links
+                if(u.getLinks().size() <= 0) {
+                    u.add(link.withRel("url"));
+                }
+            }
+
+            ControllerLinkBuilder link = ControllerLinkBuilder.linkTo(
+                    ControllerLinkBuilder.methodOn(
+                            this.getClass()
+                    ).getAll()
+            );
+
             return ResponseEntity.ok(users);
         }
         throw new RuntimeException("No se recuperó una lista con usuarios, esta es nula");
@@ -61,6 +80,23 @@ public class UserResource {
     public Resource<User> getUserById(@PathVariable("user_id") Integer userId){
         User user = this.userService.findById(userId);
         if(user != null) {
+            List<Post> posts = this.userService.findAllPostsByUserId(userId);
+
+            for(Post p : posts) {
+                ControllerLinkBuilder link = ControllerLinkBuilder.linkTo(
+                        ControllerLinkBuilder.methodOn(
+                                this.getClass()
+                        ).getUserPost(userId, p.getPostId())
+                );
+                // Esto porque temporalmente se está trabajando en una lista, por tanto para no
+                // modificar mas veces la lista se comprueba si es la primera vez que se agrega
+                // una url
+                if(p.getLinks().size() <= 0) {
+                    p.add(link.withRel("url"));
+                }
+            }
+            user.setPosts(posts);
+
             // Using HATEOAS
             Resource<User> resource = new Resource<>(user);
 
@@ -77,21 +113,6 @@ public class UserResource {
                     ).getUserById(userId)
             );
 
-            List<Post> posts = this.userService.findAllPostsByUserId(userId);
-
-            for(Post p : posts) {
-                ControllerLinkBuilder link = ControllerLinkBuilder.linkTo(
-                        ControllerLinkBuilder.methodOn(
-                                this.getClass()
-                        ).getUserPost(userId, p.getPostId())
-                );
-                // Esto porque temporalmente se está trabajando en una lista, por tanto para no
-                // modificar mas veces la lista se comprueba si es la primera vez que se agrega
-                // una url
-                if(p.getLinks().size() <= 0){
-                    p.add(link.withRel("url"));
-                }
-            }
             resource.add(linkToGetAll.withRel("all-users"));
             resource.add(autoLink.withRel("url"));
 
@@ -116,7 +137,7 @@ public class UserResource {
                 URI location = ServletUriComponentsBuilder
                         .fromCurrentRequest()
                         .path("/{postId}")
-                        .buildAndExpand(userCreated.getId())
+                        .buildAndExpand(userCreated.getUserId())
                         .toUri();
 
                 return ResponseEntity.created(location)
