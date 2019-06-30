@@ -3,6 +3,7 @@ package com.eduardocode.webservices.rest.restfulindeep.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.hateoas.ResourceSupport;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Past;
@@ -18,12 +19,13 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Post {
-    private Integer id;
+public class Post extends ResourceSupport {
+    private Integer postId;
     @NotBlank
     private String title;
     @NotBlank
     private String content;
     private Set<String> tags;
     private Date timestamp;
+
 }

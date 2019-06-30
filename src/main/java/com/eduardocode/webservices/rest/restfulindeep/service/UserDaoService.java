@@ -53,7 +53,7 @@ public class UserDaoService {
     }
 
     /**
-     * Method to get an existing user given its id
+     * Method to get an existing user given its postId
      * @param id
      * @return
      */
@@ -114,7 +114,7 @@ public class UserDaoService {
                         posts = u.getPosts();
                     }
                 }
-                post.setId(++postCount);
+                post.setPostId(++postCount);
                 posts.add(post);
 
                 // actualizando la lista vieja de posts del usuario, por la lista nueva
@@ -136,7 +136,7 @@ public class UserDaoService {
     }
 
     /**
-     * Method to retreive a post given a user id and a post id
+     * Method to retreive a post given a user postId and a post postId
      * @param userId
      * @param postId
      * @return
@@ -145,7 +145,7 @@ public class UserDaoService {
         for(User u : userRepository) {
             if(u.getId().equals(userId)){
                 for(Post p : u.getPosts()){
-                    if(p.getId().equals(postId)){
+                    if(p.getPostId().equals(postId)){
                         return p;
                     }
                 }
