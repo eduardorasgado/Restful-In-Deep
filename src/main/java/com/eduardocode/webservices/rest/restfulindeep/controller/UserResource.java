@@ -35,13 +35,15 @@ import java.util.Locale;
 @RequestMapping("/api/users")
 public class UserResource {
 
-    private final String A_LANG = "Accept-Language";
-
     // messages
     private final String user_message_runtimeException_getAll =
             "user.message.runtimeException.getAll";
     private final String user_message_userNotFoundException =
             "user.message.userNotFoundException";
+    private final String user_message_UserResource_createUser_success =
+            "user.message.UserResource.createUser.success";
+    private final String user_message_UserResource_createUser_error =
+            "user.message.UserResource.createUser.error";
 
     private UserDaoService userService;
     /**
@@ -98,7 +100,6 @@ public class UserResource {
      */
     @GetMapping("/{user_id}")
     public Resource<User> getUserById(@PathVariable("user_id") Integer userId){
-        Locale locale = LocaleContextHolder.getLocale();
 
         User user = this.userService.findById(userId);
         if(user != null) {
@@ -134,6 +135,7 @@ public class UserResource {
      */
     @PostMapping
     public ResponseEntity<?> createUser(@Valid @RequestBody UserSignUpRequest userReq) {
+        Locale locale = LocaleContextHolder.getLocale();
 
         if(userReq != null) {
             User user = this.mappingUserReq(userReq);
@@ -146,18 +148,23 @@ public class UserResource {
                         .buildAndExpand(userCreated.getUserId())
                         .toUri();
 
+                String successMsg = this.messageSource.getMessage(
+                        user_message_UserResource_createUser_success, null, locale);
+
                 return ResponseEntity.created(location)
                         .body(new ApiResponse(
                                 "success",
-                                "Se ha creado el usuario exitosamente"
+                                successMsg
                         ));
             }
         }
 
+        String errorMsg = this.messageSource.getMessage(
+                user_message_UserResource_createUser_error, null, locale
+        );
         return new ResponseEntity<>(new ApiResponse(
                 "error",
-                "No pudo ser creado el usuario, un error de servidor se presentó," +
-                        "intentelo más tarde"
+                errorMsg
         ), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
