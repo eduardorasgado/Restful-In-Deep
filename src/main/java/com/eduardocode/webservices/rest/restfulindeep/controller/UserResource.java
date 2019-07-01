@@ -19,11 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -97,9 +93,13 @@ public class UserResource {
      * class based json error details, using
      * {@link com.eduardocode.webservices.rest.restfulindeep.exception.CustomizedResponseEntityExceptionHandler}
      * rest controller and rest advice
+     * @throws
+     *      UserNotFoundException
      */
     @GetMapping("/{user_id}")
     public Resource<User> getUserById(@PathVariable("user_id") Integer userId){
+        Locale locale = LocaleContextHolder.getLocale();
+
         User user = this.userService.findById(userId);
         if(user != null) {
 
@@ -123,7 +123,8 @@ public class UserResource {
             return resource;
         }
 
-        throw new UserNotFoundException("Usuario no existente, id: "+userId);
+        String msg = this.generateUserNotFoundMessage(userId);
+        throw new UserNotFoundException(msg);
     }
 
     /**
@@ -164,11 +165,15 @@ public class UserResource {
      * Method to delete an user from
      * @param userId
      * @return
+     * @throws
+     *      UserNotFoundException
      */
     @DeleteMapping("/{user_id}")
     public ResponseEntity<?> deleteUserById(
             @PathVariable("user_id") Integer userId
     ) {
+        Locale locale = LocaleContextHolder.getLocale();
+
         if(this.userService.userExists(userId)) {
             User user = this.userService.deleteById(userId);
 
@@ -181,7 +186,8 @@ public class UserResource {
                             message.toString()
             ), HttpStatus.OK);
         }
-        throw new UserNotFoundException("El usuario que trata de eliminar no existe, postId: "+userId);
+        String msg = this.generateUserNotFoundMessage(userId);
+        throw new UserNotFoundException(msg);
     }
 
     /**
@@ -189,12 +195,16 @@ public class UserResource {
      * @param userId
      * @param postRequest
      * @return
+     * @throws
+     *      UserNotFoundException
      */
     @PostMapping("/{user_id}/posts")
     public ResponseEntity<?> createPostByUser(
             @PathVariable("user_id") Integer userId,
             @Valid @RequestBody PostRequest postRequest
     ) {
+        Locale locale = LocaleContextHolder.getLocale();
+
         if(postRequest != null) {
             Post post = this.mappingPostPayload(postRequest);
             post.setTimestamp(new Date());
@@ -205,8 +215,10 @@ public class UserResource {
                         "Se ha creado un nuevo post con exito"
                 ));
             }
+
+            String msg = this.generateUserNotFoundMessage(userId);
             // en caso de que no exista el usuario
-            throw new UserNotFoundException("usuario no existente, postId: "+userId);
+            throw new UserNotFoundException(msg);
         }
         // en caso de que postrequest venga vacio
         return new ResponseEntity<>(new ApiResponse(
@@ -219,15 +231,20 @@ public class UserResource {
      * Method to retreive all the posts given a user
      * @param userId
      * @return
+     * @throws
+     *  UserNotFoundException
      */
     @GetMapping("/{user_id}/posts")
     public ResponseEntity<List<Post>> findAllPostByUser(@PathVariable("user_id") Integer userId) {
+        Locale locale = LocaleContextHolder.getLocale();
+
         if(this.userService.userExists(userId)) {
             List<Post> posts = this.everyMemberPostListSelfUrl(userId);
             return new ResponseEntity<>(posts, HttpStatus.OK);
         }
-        throw new UserNotFoundException("El usuario de los repositorios a los que quiere tener" +
-                "acceso, no existe, id: "+userId);
+
+        String msg = this.generateUserNotFoundMessage(userId);
+        throw new UserNotFoundException(msg);
     }
 
     /**
@@ -235,6 +252,10 @@ public class UserResource {
      * @param userId
      * @param postId
      * @return
+     * @throws
+     *      UserNotFoundException
+     * @throws
+     *      PostNotFoundException
      */
     @GetMapping("/{user_id}/posts/{post_id}")
     public ResponseEntity<Resource<Post>> getUserPost(
@@ -267,7 +288,8 @@ public class UserResource {
                         +" inexistente, post postId: "+postId);
             }
         }
-        throw new UserNotFoundException("Usuario inexistente, postId: "+ userId);
+        String msg = this.generateUserNotFoundMessage(userId);
+        throw new UserNotFoundException(msg);
     }
 
     // UTILITIES =========
@@ -311,6 +333,11 @@ public class UserResource {
         return autoLink;
     }
 
+    /**
+     * Method that maps a user request payload to a User model
+     * @param userReq
+     * @return
+     */
     private User mappingUserReq(UserSignUpRequest userReq) {
         User user = new User();
         user.setName(userReq.getName());
@@ -324,6 +351,11 @@ public class UserResource {
         return user;
     }
 
+    /**
+     * Method that maps a post request payload to a post model
+     * @param postRequest
+     * @return
+     */
     private Post mappingPostPayload(PostRequest postRequest) {
         Post post = new Post();
         post.setTitle(postRequest.getTitle());
@@ -331,6 +363,23 @@ public class UserResource {
         post.setTags(postRequest.getTags());
 
         return post;
+    }
+
+    /**
+     * method to generate a {@link UserNotFoundException} error message given a locale
+     * language
+     * @param userId
+     * @return
+     */
+    private String generateUserNotFoundMessage(Integer userId) {
+        Locale locale = LocaleContextHolder.getLocale();
+
+        StringBuilder msg = new StringBuilder(this.messageSource.getMessage(
+                user_message_userNotFoundException, null, locale));
+        msg.append(" ");
+        msg.append(userId);
+
+        return msg.toString();
     }
 
 }
