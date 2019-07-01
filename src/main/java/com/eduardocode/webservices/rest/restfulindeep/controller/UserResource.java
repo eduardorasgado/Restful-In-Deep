@@ -9,6 +9,7 @@ import com.eduardocode.webservices.rest.restfulindeep.payload.PostRequest;
 import com.eduardocode.webservices.rest.restfulindeep.payload.UserSignUpRequest;
 import com.eduardocode.webservices.rest.restfulindeep.service.UserDaoService;
 import com.eduardocode.webservices.rest.restfulindeep.util.BasicUtils;
+import org.springframework.context.MessageSource;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.HttpStatus;
@@ -17,9 +18,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * <h1>UserResource</h1>
@@ -32,17 +38,32 @@ import java.util.List;
 @RequestMapping("/api/users")
 public class UserResource {
 
-    private UserDaoService userService;
+    private final String A_LANG = "Accept-Language";
 
-    public UserResource(UserDaoService userService) {
+    // messages
+    private final String user_message_runtimeException_getAll =
+            "user.message.runtimeException.getAll";
+
+    private UserDaoService userService;
+    /**
+     * Multi language message bean
+     */
+    private MessageSource messageSource;
+
+    public UserResource(UserDaoService userService,
+                        MessageSource messageSource) {
         this.userService = userService;
+        this.messageSource = messageSource;
     }
     /**
      * Method to retreive all users
      */
     @GetMapping
-    public ResponseEntity<List<User>> getAll() {
+    public ResponseEntity<List<User>> getAll(
+            @RequestHeader(name = A_LANG, required = false) Locale locale
+    ) {
         List<User> users = this.userService.findAll();
+        users = null;
         if(users != null) {
             // adding url to every user
             for(User u : users) {
@@ -59,7 +80,10 @@ public class UserResource {
 
             return ResponseEntity.ok(users);
         }
-        throw new RuntimeException("No se recuperó una lista con usuarios, esta es nula");
+        String msg = messageSource.getMessage(user_message_runtimeException_getAll,
+                null, locale);
+
+        throw new RuntimeException(msg);
     }
 
     /**
@@ -85,7 +109,7 @@ public class UserResource {
             ControllerLinkBuilder linkToGetAll = ControllerLinkBuilder.linkTo(
                     ControllerLinkBuilder.methodOn(
                             this.getClass()
-                    ).getAll());
+                    ).getAll(null));
 
             ControllerLinkBuilder autoLink = this.getUserLink(userId);
 
