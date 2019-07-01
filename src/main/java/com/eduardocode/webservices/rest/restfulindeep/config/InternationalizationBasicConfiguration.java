@@ -6,6 +6,7 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
 /**
@@ -37,6 +38,8 @@ public class InternationalizationBasicConfiguration {
 
         // This will take messages and everithing in resources/ that start with messages*
         messageSource.setBasename("mensajes");
+        messageSource.setDefaultEncoding(StandardCharsets.ISO_8859_1.name());
+        messageSource.setUseCodeAsDefaultMessage(true);
 
         return messageSource;
     }
