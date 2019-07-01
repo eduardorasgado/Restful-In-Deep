@@ -1,12 +1,17 @@
 package com.eduardocode.webservices.rest.restfulindeep.exception;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -14,6 +19,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 /**
  * <h1>CustomizedResponseEntityExceptionHandler</h1>
@@ -27,6 +34,9 @@ import java.util.List;
 @ControllerAdvice
 @RestController
 public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @Autowired
+    private MessageSource messageSource;
 
     /**
      * Method to handle all the exceptions can occur in resources
@@ -97,17 +107,52 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
             MethodArgumentNotValidException ex, HttpHeaders headers,
             HttpStatus status, WebRequest request) {
 
-        List<ObjectError> errors = ex.getBindingResult().getAllErrors();
-        List<String> messages = new ArrayList<>();
-        for(ObjectError e : errors) {
-            messages.add(e.getDefaultMessage());
-        }
+        List<String> errorMessages = ex.getBindingResult().getFieldErrors()
+                .stream()
+                // method build message bellow will be applied to every error object
+                .map(this::buildMessage)
+                .collect(Collectors.toList());
 
         ResponseGeneralException rge = new ResponseGeneralException(
                 new Date(),
                 "Data validation failure",
-                messages.toString()
+                errorMessages.toString()
         );
         return new ResponseEntity<>(rge, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Method that extract field error data into a string with next shape:
+     *  error.feObjectName.feField.feCodeLowerCase
+     * Example:
+     *  error.person.name.notblank
+     *
+     *  When it get the string done, it parse it in message source to get locale error translated
+     *  message
+     *
+     * @param fe
+     *      Error message in i19n format
+     * @return
+     */
+    private String buildMessage(FieldError fe) {
+        StringBuilder errorCode = new StringBuilder("");
+        Locale locale = LocaleContextHolder.getLocale();
+        String customErrorMsgI18n = "";
+
+        if(fe != null) {
+            errorCode.append("error").append(".");
+            errorCode.append(fe.getObjectName()).append(".");
+            errorCode.append(fe.getField()).append(".");
+            errorCode.append(fe.getCode().toLowerCase());
+
+            try {
+                customErrorMsgI18n = this.messageSource.getMessage(
+                        errorCode.toString(), (Object[]) null, locale
+                );
+            } catch (Exception e) {
+                customErrorMsgI18n = fe.getDefaultMessage();
+            }
+        }
+        return customErrorMsgI18n;
     }
 }
