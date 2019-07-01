@@ -30,6 +30,7 @@ import java.util.Locale;
  * interaction with user dao service
  *
  * @author Eduardo Rasgado Ruiz
+ * @version 1.0
  */
 @RestController
 @RequestMapping("/api/users")
