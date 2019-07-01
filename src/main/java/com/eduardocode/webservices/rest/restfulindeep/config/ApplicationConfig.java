@@ -1,5 +1,6 @@
 package com.eduardocode.webservices.rest.restfulindeep.config;
 
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -10,33 +11,39 @@ import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
 /**
- * Configuration class for internationalization feature in whole appllication.
+ * <h1>ApplicationConfig</h1>
+ * Class that set important and general beans to application
+ *
+ * @author Eduardo Rasgado Ruiz
+ * @version 1.0
  */
 @Configuration
-public class InternationalizationBasicConfiguration {
+public class ApplicationConfig {
 
     /**
-     * Bean that set a default language for not specific requests based on header key: Accept-language
+     * Bean that set to {@link CustomLocaleResolver} as default local resolver
+     * for every time LocaleContextHolder is called in all the application resources.
+     * This will set correct locale language given the request key: Accept-Language
+     * passed to request in client side.
      * @return
+     *      A configuration class to solve application locale
      */
     @Bean
     public LocaleResolver localeResolver() {
-        SessionLocaleResolver localeResolver = new SessionLocaleResolver();
-        localeResolver.setDefaultLocale(Locale.US);
-        return localeResolver;
+        return new CustomLocaleResolver();
     }
 
-
     /**
-     * Method to tell our application where is the source of our translated messages for internationalization,
+     * Method that tells our application where is the source of our translated messages for internationalization,
      * it should be in resources/ as root.
      * @return
+     *      message source bundle with some mensajes_* properties
      */
     @Bean
     public ResourceBundleMessageSource messageSource() {
         ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
 
-        // This will take messages and everithing in resources/ that start with messages*
+        // This will take messages and everithing in resources/ that start with mensajes_*
         messageSource.setBasename("mensajes");
         messageSource.setDefaultEncoding(StandardCharsets.ISO_8859_1.name());
         messageSource.setUseCodeAsDefaultMessage(true);
