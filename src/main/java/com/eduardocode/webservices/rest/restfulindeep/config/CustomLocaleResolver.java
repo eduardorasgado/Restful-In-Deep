@@ -26,6 +26,8 @@ public class CustomLocaleResolver extends AcceptHeaderLocaleResolver {
 
     @Value("${app.locale.spanish}")
     private String localeEs;
+    @Value("${app.local.spanish.mx}")
+    private String localeMx;
     @Value("${app.locale.english}")
     private String localeEn;
     @Value("${app.locale.french}")
@@ -47,6 +49,7 @@ public class CustomLocaleResolver extends AcceptHeaderLocaleResolver {
         if(LOCALES == null) {
             LOCALES = Arrays.asList(
                     new Locale(localeEs),
+                    new Locale(localeEs, localeMx),
                     new Locale(localeFr),
                     new Locale(localeEn)
             );
