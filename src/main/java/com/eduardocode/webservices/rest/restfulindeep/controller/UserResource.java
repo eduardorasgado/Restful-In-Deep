@@ -10,6 +10,7 @@ import com.eduardocode.webservices.rest.restfulindeep.payload.UserSignUpRequest;
 import com.eduardocode.webservices.rest.restfulindeep.service.UserDaoService;
 import com.eduardocode.webservices.rest.restfulindeep.util.BasicUtils;
 import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.HttpStatus;
@@ -43,6 +44,8 @@ public class UserResource {
     // messages
     private final String user_message_runtimeException_getAll =
             "user.message.runtimeException.getAll";
+    private final String user_message_userNotFoundException =
+            "user.message.userNotFoundException";
 
     private UserDaoService userService;
     /**
@@ -59,11 +62,12 @@ public class UserResource {
      * Method to retreive all users
      */
     @GetMapping
-    public ResponseEntity<List<User>> getAll(
-            @RequestHeader(name = A_LANG, required = false) Locale locale
-    ) {
+    public ResponseEntity<List<User>> getAll() {
+        Locale locale = LocaleContextHolder.getLocale();
+        System.out.println(locale);
+
         List<User> users = this.userService.findAll();
-        users = null;
+
         if(users != null) {
             // adding url to every user
             for(User u : users) {
@@ -109,7 +113,7 @@ public class UserResource {
             ControllerLinkBuilder linkToGetAll = ControllerLinkBuilder.linkTo(
                     ControllerLinkBuilder.methodOn(
                             this.getClass()
-                    ).getAll(null));
+                    ).getAll());
 
             ControllerLinkBuilder autoLink = this.getUserLink(userId);
 
@@ -118,7 +122,8 @@ public class UserResource {
 
             return resource;
         }
-        throw new UserNotFoundException("Usuario no existente, postId: "+userId);
+
+        throw new UserNotFoundException("Usuario no existente, id: "+userId);
     }
 
     /**
