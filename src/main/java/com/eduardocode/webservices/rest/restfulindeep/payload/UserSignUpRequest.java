@@ -28,9 +28,8 @@ public class UserSignUpRequest {
     // TODO: Separate value in application.properties, parse it and used in messages
     @Size(min = 2, max = 50)
     private String name;
-    @NotBlank(message = "El apellido no debe estar vacío")
-    @Size(min = 2, message = "El apellido no puede ser menor a 2 caracteres")
-    @Size(max = 50, message = "El apellido no puede ser mayor a 50 caracteres")
+    @NotBlank
+    @Size(min= 2, max = 50)
     private String lastName;
     @NotBlank(message = "La fecha de nacimiento no debe estar vacía")
     private String birthDate;
