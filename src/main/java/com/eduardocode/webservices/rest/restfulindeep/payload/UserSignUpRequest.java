@@ -31,7 +31,7 @@ public class UserSignUpRequest {
     @NotBlank
     @Size(min= 2, max = 50)
     private String lastName;
-    @NotBlank(message = "La fecha de nacimiento no debe estar vacía")
+    @NotBlank
     private String birthDate;
 }
 
