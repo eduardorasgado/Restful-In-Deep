@@ -45,6 +45,11 @@ public class UserResource {
             "user.message.UserResource.createUser.success";
     private final String user_message_UserResource_createUser_error =
             "user.message.UserResource.createUser.error";
+    private final String user_message_UserResource_deleteUser_message1p =
+            "user.message.UserResource.deleteUser.message1p";
+    private final String user_message_UserResource_deleteUser_message2p =
+            "user.message.UserResource.deleteUser.message2p";
+
 
     private UserDaoService userService;
     /**
@@ -180,18 +185,15 @@ public class UserResource {
     public ResponseEntity<?> deleteUserById(
             @PathVariable("user_id") Integer userId
     ) {
-        Locale locale = LocaleContextHolder.getLocale();
 
         if(this.userService.userExists(userId)) {
             User user = this.userService.deleteById(userId);
 
-            StringBuilder message = new StringBuilder("El usuario: ");
-            message.append(user.getName());
-            message.append(" ha sido eliminado con éxito");
+            String message = this.createDeleteUserMessage(user);
 
             return new ResponseEntity<>(new ApiResponse(
                     "success",
-                            message.toString()
+                            message
             ), HttpStatus.OK);
         }
         String msg = this.generateUserNotFoundMessage(userId);
@@ -211,8 +213,6 @@ public class UserResource {
             @PathVariable("user_id") Integer userId,
             @Valid @RequestBody PostRequest postRequest
     ) {
-        Locale locale = LocaleContextHolder.getLocale();
-
         if(postRequest != null) {
             Post post = this.mappingPostPayload(postRequest);
             post.setTimestamp(new Date());
@@ -244,7 +244,6 @@ public class UserResource {
      */
     @GetMapping("/{user_id}/posts")
     public ResponseEntity<List<Post>> findAllPostByUser(@PathVariable("user_id") Integer userId) {
-        Locale locale = LocaleContextHolder.getLocale();
 
         if(this.userService.userExists(userId)) {
             List<Post> posts = this.everyMemberPostListSelfUrl(userId);
@@ -292,7 +291,7 @@ public class UserResource {
                 return ResponseEntity.ok(postResource);
             }
             else {
-                throw new PostNotFoundException("Post de usuario con postId:"+userId
+                throw new PostNotFoundException("Post de usuario con userId:"+userId
                         +" inexistente, post postId: "+postId);
             }
         }
@@ -388,6 +387,31 @@ public class UserResource {
         msg.append(userId);
 
         return msg.toString();
+    }
+
+    /**
+     * Method to create a i18n message to send in api response when user was deleted
+     * @param user
+     * @return
+     */
+    private String createDeleteUserMessage(User user){
+        Locale locale = LocaleContextHolder.getLocale();
+
+        StringBuilder message = new StringBuilder(
+                this.messageSource.getMessage(
+                        user_message_UserResource_deleteUser_message1p, null, locale
+                )
+        );
+        message.append(" ");
+        message.append(user.getName());
+        message.append(" ");
+        message.append(
+                this.messageSource.getMessage(
+                        user_message_UserResource_deleteUser_message2p, null, locale
+                )
+        );
+
+        return message.toString();
     }
 
 }
