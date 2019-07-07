@@ -53,6 +53,11 @@ public class UserResource {
             "user.message.UserResource.createPostsByUser.success";
     private final String user_message_UserResource_createPostsByUser_error =
             "user.message.UserResource.createPostsByUser.error";
+    private final String user_message_UserResource_getUserPost_postNotFound1p =
+            "user.message.UserResource.getUserPost.postNotFound1p";
+    private final String user_message_UserResource_getUserPost_postNotFound2p =
+            "user.message.UserResource.getUserPost.postNotFound2p";
+
 
 
     private UserDaoService userService;
@@ -303,8 +308,9 @@ public class UserResource {
                 return ResponseEntity.ok(postResource);
             }
             else {
-                throw new PostNotFoundException("Post de usuario con userId:"+userId
-                        +" inexistente, post postId: "+postId);
+                String message = this.createGetUserPostFuncPostNotFoundMessage(userId, postId);
+
+                throw new PostNotFoundException(message);
             }
         }
         String msg = this.generateUserNotFoundMessage(userId);
@@ -407,23 +413,52 @@ public class UserResource {
      * @return
      */
     private String createDeleteUserMessage(User user){
+        StringBuilder message = this.createMessageBuilderWithTwoParts(
+                user.getName(),
+                user_message_UserResource_deleteUser_message1p,
+                user_message_UserResource_deleteUser_message2p);
+
+        return message.toString();
+    }
+
+    /**
+     * Method to create a message that will be send when a post object is not present in
+     * getUserPost function
+     * @param userId
+     * @param postId
+     * @return
+     */
+    private String createGetUserPostFuncPostNotFoundMessage(Integer userId, Integer postId) {
+
+        StringBuilder message = this.createMessageBuilderWithTwoParts(
+                userId.toString(),
+                user_message_UserResource_getUserPost_postNotFound1p,
+                user_message_UserResource_getUserPost_postNotFound2p
+        );
+        message.append(" ");
+        message.append(postId);
+        return message.toString();
+    }
+
+    private StringBuilder createMessageBuilderWithTwoParts(
+            String element, String part1, String part2
+    ) {
         Locale locale = LocaleContextHolder.getLocale();
 
         StringBuilder message = new StringBuilder(
                 this.messageSource.getMessage(
-                        user_message_UserResource_deleteUser_message1p, null, locale
+                        part1, null, locale
                 )
         );
         message.append(" ");
-        message.append(user.getName());
+        message.append(element);
         message.append(" ");
         message.append(
                 this.messageSource.getMessage(
-                        user_message_UserResource_deleteUser_message2p, null, locale
+                        part2, null, locale
                 )
         );
-
-        return message.toString();
+        return message;
     }
 
 }
