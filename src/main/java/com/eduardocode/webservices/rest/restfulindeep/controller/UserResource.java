@@ -49,6 +49,10 @@ public class UserResource {
             "user.message.UserResource.deleteUser.message1p";
     private final String user_message_UserResource_deleteUser_message2p =
             "user.message.UserResource.deleteUser.message2p";
+    private final String user_message_UserResource_createPostsByUser_success =
+            "user.message.UserResource.createPostsByUser.success";
+    private final String user_message_UserResource_createPostsByUser_error =
+            "user.message.UserResource.createPostsByUser.error";
 
 
     private UserDaoService userService;
@@ -213,14 +217,19 @@ public class UserResource {
             @PathVariable("user_id") Integer userId,
             @Valid @RequestBody PostRequest postRequest
     ) {
+        Locale locale = LocaleContextHolder.getLocale();
+        String message;
         if(postRequest != null) {
             Post post = this.mappingPostPayload(postRequest);
             post.setTimestamp(new Date());
             post = this.userService.createPost(userId, post);
             if(post != null) {
+                 message = this.messageSource.getMessage(
+                        user_message_UserResource_createPostsByUser_success, null, locale
+                );
                 return ResponseEntity.ok(new ApiResponse(
                         "success",
-                        "Se ha creado un nuevo post con exito"
+                        message
                 ));
             }
 
@@ -228,10 +237,13 @@ public class UserResource {
             // en caso de que no exista el usuario
             throw new UserNotFoundException(msg);
         }
+        message = this.messageSource.getMessage(
+                user_message_UserResource_createPostsByUser_error, null, locale
+        );
         // en caso de que postrequest venga vacio
         return new ResponseEntity<>(new ApiResponse(
                 "error",
-                "No existe el postRequest o está vacío"
+                message
         ), HttpStatus.BAD_REQUEST);
     }
 
