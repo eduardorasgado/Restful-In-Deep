@@ -20,9 +20,7 @@ import javax.validation.constraints.Size;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-/**
- * for swagger documentation
- */
+// for swagger documentation
 @ApiModel(description="All details about the new user")
 public class UserSignUpRequest {
     @NotBlank

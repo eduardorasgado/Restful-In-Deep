@@ -1,5 +1,8 @@
 package com.eduardocode.webservices.rest.restfulindeep.config;
 
+import com.eduardocode.webservices.rest.restfulindeep.payload.ApiResponse;
+import com.fasterxml.classmate.TypeResolver;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -23,8 +26,15 @@ import java.util.Set;
  */
 @Configuration
 @EnableSwagger2
+// This annotation is to set a properties file to enable ${} sintaxis message addition
 @PropertySource("classpath:mensajes.properties")
 public class SwaggerConfiguration {
+
+    private TypeResolver typeResolver;
+
+    public SwaggerConfiguration(TypeResolver typeResolver) {
+        this.typeResolver = typeResolver;
+    }
 
     public static final Contact DEFAULT_CONTACT = new Contact(
             "Aaron Landeros", "", "aaron.landeros@gmamil.com");
@@ -59,6 +69,17 @@ public class SwaggerConfiguration {
 
                 // telling user in api doc client that api supports xml and json
                 .produces(DEFAULT_PRODUCES_AND_CONSUMES)
-                .consumes(DEFAULT_PRODUCES_AND_CONSUMES);
+                .consumes(DEFAULT_PRODUCES_AND_CONSUMES)
+
+                /**
+                 * api response is not be showing in swagger doc by default
+                 * so it is good to tell swagger configuration that should show it
+                 * in models info
+                  */
+                .additionalModels(
+                        typeResolver.resolve(
+                                ApiResponse.class
+                        )
+                );
     }
 }

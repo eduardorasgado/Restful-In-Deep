@@ -1,5 +1,6 @@
 package com.eduardocode.webservices.rest.restfulindeep.payload;
 
+import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@ApiModel
 public class PostRequest {
     @NotBlank
     @Size(min = 10, max = 40)
