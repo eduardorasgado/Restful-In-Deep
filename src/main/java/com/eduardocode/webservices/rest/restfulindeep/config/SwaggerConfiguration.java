@@ -2,6 +2,7 @@ package com.eduardocode.webservices.rest.restfulindeep.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.service.VendorExtension;
@@ -22,6 +23,7 @@ import java.util.Set;
  */
 @Configuration
 @EnableSwagger2
+@PropertySource("classpath:mensajes.properties")
 public class SwaggerConfiguration {
 
     public static final Contact DEFAULT_CONTACT = new Contact(
