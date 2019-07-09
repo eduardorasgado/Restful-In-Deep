@@ -48,7 +48,8 @@ public class UserSignUpRequest {
     /**
      * Api information for the fields of the api model
      */
-    @ApiModelProperty(notes = "birth date should only be in past time")
+    @ApiModelProperty(notes = "${error.userSignUpRequest.birthDate.past}",
+            required = true)
     @NotBlank
     private String birthDate;
 }
