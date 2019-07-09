@@ -10,6 +10,9 @@ import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * <h1>SwaggerConfiguration</h1>
@@ -24,7 +27,7 @@ public class SwaggerConfiguration {
     public static final Contact DEFAULT_CONTACT = new Contact(
             "Aaron Landeros", "", "aaron.landeros@gmamil.com");
 
-    private final ApiInfo CUSTOM_API_INFO = new ApiInfo(
+    private static final ApiInfo CUSTOM_API_INFO = new ApiInfo(
             "My Company Documentation",
             "This api has been developed by a awesome company",
             "1.0",
@@ -33,6 +36,15 @@ public class SwaggerConfiguration {
             "MIT",
             "",
             new ArrayList<VendorExtension>());
+
+    private static final Set<String> DEFAULT_PRODUCES_AND_CONSUMES =
+            new HashSet<String>(
+                    Arrays.asList(
+                            "application/json",
+                            "application/xml"
+                    )
+            );
+
     /**
      * This method configures the default options for documentation
      * @return swagger docket
@@ -40,6 +52,11 @@ public class SwaggerConfiguration {
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
-                .apiInfo(CUSTOM_API_INFO);
+                //custom api doc information
+                .apiInfo(CUSTOM_API_INFO)
+
+                // telling user in api doc client that api supports xml and json
+                .produces(DEFAULT_PRODUCES_AND_CONSUMES)
+                .consumes(DEFAULT_PRODUCES_AND_CONSUMES);
     }
 }
