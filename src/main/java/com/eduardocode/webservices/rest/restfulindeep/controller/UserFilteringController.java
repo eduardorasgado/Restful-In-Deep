@@ -1,6 +1,7 @@
 package com.eduardocode.webservices.rest.restfulindeep.controller;
 
 import com.eduardocode.webservices.rest.restfulindeep.model.User;
+import com.eduardocode.webservices.rest.restfulindeep.payload.PostResponse;
 import com.eduardocode.webservices.rest.restfulindeep.payload.UserResponse;
 import com.google.common.collect.Sets;
 import org.springframework.hateoas.Resource;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -20,7 +22,7 @@ import java.util.Set;
  * @since 1.0
  */
 @RestController
-@RequestMapping("/api/partial-user")
+@RequestMapping("/api/partial-users")
 public class UserFilteringController {
 
     /**
@@ -72,6 +74,37 @@ public class UserFilteringController {
                 ).retreiveSomeUser(userId)
         );
         resource.add(link.withSelfRel());
+        return resource;
+    }
+
+    /**
+     * Method that returns a specific post resource given a user id and the post id
+     * @param userId
+     *      User Id, should be integer
+     * @param postId
+     *      Post Id, should be Integer
+     * @return
+     *      A User resource partial data
+     */
+    @GetMapping("/{user_id}/posts/{post_id}")
+    public Resource<PostResponse> getPostUser(
+            @PathVariable("user_id") Integer userId,
+            @PathVariable("post_id") Integer postId
+    ) {
+        PostResponse post = new PostResponse(postId,
+                "title1",
+                "content1",
+                new HashSet<>());
+
+        Resource<PostResponse> resource = new Resource<>(post);
+
+        ControllerLinkBuilder link = ControllerLinkBuilder.linkTo(
+                ControllerLinkBuilder.methodOn(
+                        this.getClass()
+                ).getPostUser(userId, postId)
+        );
+        resource.add(link.withSelfRel());
+
         return resource;
     }
 }
