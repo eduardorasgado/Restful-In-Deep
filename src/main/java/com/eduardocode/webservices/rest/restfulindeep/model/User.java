@@ -1,5 +1,6 @@
 package com.eduardocode.webservices.rest.restfulindeep.model;
 
+import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@ApiModel(description = "User data stored in db")
 public class User extends ResourceSupport {
     private Integer userId;
     @NotBlank
