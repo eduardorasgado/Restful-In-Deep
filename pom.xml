@@ -72,13 +72,18 @@
             <artifactId>jackson-dataformat-xml</artifactId>
         </dependency>
 
-        <!-- package to be able to monitor our spring boot application -->
+        <!-- package to be able to monitor our spring boot application
+            to enter the actuator: http://server_here:port/actuator
+        -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
-        <!-- dependency to show monitor or actuator UI/ HAL - Hypertext Application Language -->
+        <!-- dependency to show monitor or actuator UI/ HAL - Hypertext Application Language
+            to enter the hal UI: http://localhost:8080 or server entrypoint
+            now we can access to actuator: metrics Links
+        -->
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-rest-hal-browser</artifactId>
