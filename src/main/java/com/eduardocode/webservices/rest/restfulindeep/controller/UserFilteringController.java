@@ -1,7 +1,10 @@
 package com.eduardocode.webservices.rest.restfulindeep.controller;
 
+import com.eduardocode.webservices.rest.restfulindeep.model.User;
 import com.eduardocode.webservices.rest.restfulindeep.payload.UserResponse;
 import com.google.common.collect.Sets;
+import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,21 +23,55 @@ import java.util.Set;
 @RequestMapping("/api/partial-user")
 public class UserFilteringController {
 
+    /**
+     * Method to return all partial user data to client.
+     *
+     * @return
+     *      A set of UserResponse that inherits from {@link org.springframework.hateoas.ResourceSupport}
+     *      and have partial data for every member of the set.
+     */
     @GetMapping
     public Set<UserResponse> retreiveAllPartial() {
-        return Sets.newHashSet(
+        Set<UserResponse> users = Sets.newHashSet(
                 new UserResponse(1, "value2", "value3", null),
                 new UserResponse(2, "value22", "value32", null),
                 new UserResponse(3, "value23", "value33", null),
                 new UserResponse(4, "value24", "value34", null)
         );
+
+        users.forEach((UserResponse user) -> {
+            ControllerLinkBuilder selfLink = ControllerLinkBuilder.linkTo(
+                    ControllerLinkBuilder.methodOn(
+                            this.getClass()
+                    ).retreiveSomeUser(user.getUserId())
+            );
+            if(user.getLinks().size() <=0) {
+                user.add(selfLink.withSelfRel());
+            }
+        });
+
+        return users;
     }
 
+    /**
+     * Method to return specific partial user data given a user_id in path variable(client url).
+     *
+     * @param userId
+     * @return
+     *      User Resource with partial data
+     */
     @GetMapping("/{user_id}")
-    public UserResponse retreiveSomeUser(
+    public Resource<UserResponse> retreiveSomeUser(
             @PathVariable("user_id") Integer userId
     ) {
-
-        return new UserResponse(userId, "value2", "value3", null);
+        UserResponse user = new UserResponse(userId, "value2", "value3", null);
+        Resource<UserResponse> resource = new Resource<>(user);
+        ControllerLinkBuilder link = ControllerLinkBuilder.linkTo(
+                ControllerLinkBuilder.methodOn(
+                        this.getClass()
+                ).retreiveSomeUser(userId)
+        );
+        resource.add(link.withSelfRel());
+        return resource;
     }
 }

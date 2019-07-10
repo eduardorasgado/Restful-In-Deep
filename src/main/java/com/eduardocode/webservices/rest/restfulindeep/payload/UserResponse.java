@@ -9,13 +9,14 @@ import java.util.Date;
 
 /**
  * <h1>UserResponse</h1>
- * User data to send to client
+ * User data to send to client, this will be partially sent because
+ * jsonIgnore annotation
  *
  * @author Eduardo Rasgado Ruiz
  */
 @AllArgsConstructor
 @Data
-public class UserResponse {
+public class UserResponse extends ResourceSupport {
     private Integer userId;
     private String name;
     private String lastName;
