@@ -122,6 +122,15 @@ public class UserFilteringController {
                 new PostResponse(3, "title3", "content", new HashSet<>()),
                 new PostResponse(4, "title4", "content", new HashSet<>())
         );
+
+        posts.forEach((PostResponse post) -> {
+            ControllerLinkBuilder selfLink = ControllerLinkBuilder.linkTo(
+                    ControllerLinkBuilder.methodOn(
+                            this.getClass()
+                    ).getPostUser(userId, post.getPostId())
+            );
+            post.add(selfLink.withSelfRel());
+        });
         return ResponseEntity.ok(posts);
     }
 }
