@@ -6,12 +6,16 @@ import com.eduardocode.webservices.rest.restfulindeep.payload.UserResponse;
 import com.google.common.collect.Sets;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -106,5 +110,18 @@ public class UserFilteringController {
         resource.add(link.withSelfRel());
 
         return resource;
+    }
+
+    @GetMapping("/{user_id}/posts")
+    public ResponseEntity<List<PostResponse>> getAllPostsByUser(
+            @PathVariable("user_id") Integer userId
+    ) {
+        List<PostResponse> posts = Arrays.asList(
+                new PostResponse(1, "title", "content", new HashSet<>()),
+                new PostResponse(2, "title2", "content", new HashSet<>()),
+                new PostResponse(3, "title3", "content", new HashSet<>()),
+                new PostResponse(4, "title4", "content", new HashSet<>())
+        );
+        return ResponseEntity.ok(posts);
     }
 }
