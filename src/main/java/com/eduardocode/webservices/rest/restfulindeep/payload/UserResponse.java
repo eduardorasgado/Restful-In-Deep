@@ -21,9 +21,9 @@ import java.util.Date;
 @Data
 @ApiModel(description = "Partial user data as response")
 // second method to igore properties
-@JsonIgnoreProperties(value = {
-        "userId", "lastName"
-})
+//@JsonIgnoreProperties(value = {
+//        "userId", "lastName"
+//})
 public class UserResponse extends ResourceSupport {
 
     @ApiModelProperty(notes = "${userResponse.model.userId.range}")
@@ -33,6 +33,6 @@ public class UserResponse extends ResourceSupport {
     @ApiModelProperty(notes = "${userResponse.model.name.mayus}")
     private String lastName;
     // first method to ignore properties when this object is returned to client side.
-    @JsonIgnore
+    //@JsonIgnore
     private Date birthDate;
 }
