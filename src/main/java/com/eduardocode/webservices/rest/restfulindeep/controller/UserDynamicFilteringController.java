@@ -5,13 +5,13 @@ import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.PropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.google.common.collect.Sets;
 import org.springframework.http.converter.json.MappingJacksonValue;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * <h1>UserDynamicFilteringController</h1>
@@ -82,4 +82,59 @@ public class UserDynamicFilteringController {
         return mapping;
     }
 
+    /**
+     * Method to return all the users with certain fields using a dynamic
+     * filter
+     * @param userId
+     *      value in url, boolean
+     * @param name
+     *      value in url, boolean
+     * @param lastName
+     *      value in url, boolean
+     * @param birthDate
+     *      value in url, boolean
+     * @return
+     *      dynamic filtered out user list
+     */
+    @GetMapping
+    public MappingJacksonValue retreiveUsersList(
+            @RequestParam("userId") Boolean userId,
+            @RequestParam("name") Boolean name,
+            @RequestParam("lastName") Boolean lastName,
+            @RequestParam("birthDate") Boolean birthDate
+    ){
+        Set<String> params = new HashSet<>();
+        if(userId) {
+            params.add("userId");
+        }
+        if(name) {
+            params.add("name");
+        }
+        if(lastName) {
+            params.add("lastName");
+        }
+        if(birthDate) {
+            params.add("birthDate");
+        }
+
+        Set<UserResponse> users = Sets.newHashSet(
+                new UserResponse(1, "value2", "value3", null),
+                new UserResponse(2, "value22", "value32", null),
+                new UserResponse(3, "value23", "value33", null),
+                new UserResponse(4, "value24", "value34", null)
+        );
+
+        MappingJacksonValue mapping = new MappingJacksonValue(users);
+
+        FilterProvider filters = new SimpleFilterProvider()
+                .addFilter(
+                        "retreiveUser",
+                        SimpleBeanPropertyFilter
+                                .filterOutAllExcept(
+                                        params
+                                )
+                );
+        mapping.setFilters(filters);
+        return mapping;
+    }
 }
