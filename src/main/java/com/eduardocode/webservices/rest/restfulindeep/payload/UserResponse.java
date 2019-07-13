@@ -1,5 +1,6 @@
 package com.eduardocode.webservices.rest.restfulindeep.payload;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModel;
@@ -24,6 +25,7 @@ import java.util.Date;
 //@JsonIgnoreProperties(value = {
 //        "userId", "lastName"
 //})
+@JsonFilter("retreiveUser")
 public class UserResponse extends ResourceSupport {
 
     @ApiModelProperty(notes = "${userResponse.model.userId.range}")
