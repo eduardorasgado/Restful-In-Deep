@@ -96,7 +96,9 @@ public class UserDynamicFilteringController {
      * @return
      *      dynamic filtered out user list
      */
-    @GetMapping
+    @GetMapping(
+            produces = "application/vnd.eduardocode.restfulindeep.v1+json"
+    )
     public MappingJacksonValue retreiveUsersList(
             @RequestParam("userId") Boolean userId,
             @RequestParam("name") Boolean name,
