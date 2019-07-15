@@ -40,7 +40,9 @@ public class UserController {
      */
     @GetMapping(
             // TODO: Reseach about how to create documentation for different api versions.
-            produces = "application/vnd.eduardocode.restfulindeep.v2+json"
+            // Media type versioning(MIME versioning) aka "content negociation or "accept header"
+            produces = {"application/vnd.eduardocode.restfulindeep.v2+json",
+                        "application/vnd.eduardocode.restfulindeep.v2+xml"}
     )
     public MappingJacksonValue retreiveUsersList(
             @RequestParam("userId") Boolean userId,

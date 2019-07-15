@@ -97,7 +97,11 @@ public class UserDynamicFilteringController {
      *      dynamic filtered out user list
      */
     @GetMapping(
-            produces = "application/vnd.eduardocode.restfulindeep.v1+json"
+            // Media type versioning(MIME versioning) aka "content negociation or "accept header"
+            produces = {
+                    "application/vnd.eduardocode.restfulindeep.v1+json",
+                    "application/vnd.eduardocode.restfulindeep.v1+xml"
+            }
     )
     public MappingJacksonValue retreiveUsersList(
             @RequestParam("userId") Boolean userId,
