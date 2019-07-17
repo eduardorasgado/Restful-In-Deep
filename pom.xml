@@ -80,6 +80,11 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
         <!-- dependency to show monitor or actuator UI/ HAL - Hypertext Application Language
             to enter the hal UI: http://localhost:8080 or server entrypoint
             now we can access to actuator: metrics Links
